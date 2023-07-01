@@ -7,15 +7,16 @@ dotenv.config();
 const THREE_MINUTES  = 3 * 60000;
 
 const url = process.env.URL;
-const serviceId = process.env.SERVICE_ID;
+const serviceID = process.env.SERVICE_ID;
 const publicKey = process.env.PUBLIC_KEY;
 const privateKey = process.env.PRIVATE_KEY;
+const templateID = process.env.EMAIL_TEMPALTE_ID;
 
 let attempts = 0;
 
 async function webScrape () {
 	attempts++;
-	console.log("Web scrape running...", new Date());
+	console.log("Web scrape running...", new Date().toLocaleString("sv-SE"));
 	const browser = await puppeteer.launch({ headless: "new"});
 	const page = await browser.newPage();
 	await page.goto(url);
@@ -86,26 +87,13 @@ async function webScrape () {
 	return newObjects;
 }
 
-async function sendEmail(objs) {
+async function sendEmail(emailValue) {
 	emailjs.init({publicKey, privateKey});
-	let templateID = "";
-	let emailValue = {};
 	attempts = 0;
-	if(objs.length) {
-		// Send email with objects
-		console.log("Email technically sent with new objects", );
-		templateID = process.env.TEMPLATE_FOUND_ID;
-		emailValue = getHtmlFormat(objs);
-	} else {
-		// Send empty template email
-		console.log("No new objects found but email was sent either way", );
-		templateID = process.env.TEMPLATE_NOTHING_ID;
-		emailValue = { attempts };
-	}
-
+	console.log("Emailvalue", emailValue);
 	try {
-		await emailjs.send(serviceId, templateID, emailValue);
-		console.log("Email sent");
+		await emailjs.send(serviceID, templateID, emailValue);
+		console.log("Email sent", new Date().toLocaleString("sv-SE"));
 	} catch (error) {
 		if (error instanceof EmailJSResponseStatus) {
 			console.log("EMAILJS FAILED...", error);
@@ -116,23 +104,30 @@ async function sendEmail(objs) {
 }
 
 function runCodeAtSpecificTime(targetTime) {
-	console.log("Setting new timeout for", targetTime);
+	console.log("Setting new timeout for", targetTime.toLocaleString("sv-SE"));
 	const timeDifference = targetTime - new Date();
 	setTimeout(async () => {
 		const objects = await webScrape();
-		const stopRetrying = new Date() > new Date().setHours(15,25, 0,0);
+		const stopRetrying = new Date() > new Date().setHours(21,10, 0,0);
 		if(!objects.length && !stopRetrying) {
 			console.log("No result.. Trying again in 3 minutes!");
 			runCodeAtSpecificTime(getRetryTime());
 		} else {
-			console.log("We got some objects or we stopped retrying, sending email!");
-			sendEmail(objects);
+			let emailValue = {};
+			if(objects.length) {
+				console.log("Objects found, sending the email!" );
+				emailValue = getFoundHtml(objs);
+			} else {
+				console.log("Nothing new today, stopping and sending confirmation email.");
+				emailValue = getNothingHtml();
+			}
+			sendEmail(emailValue);
 			runCodeAtSpecificTime(getTomorrowStartDate());
 		}
 	}, timeDifference);
 }  
 
-function getHtmlFormat(objects) {
+function getFoundHtml(objects) {
 	const values = {};
 	objects.forEach((obj, i) => {
 		values[`obj${i}`] = `<h3>${obj.address}</h3>
@@ -153,10 +148,24 @@ function getHtmlFormat(objects) {
 	return values;
 }
 
+function getNothingHtml () {
+	return {
+		obj0: `Contetus scraper har kört ${attempts} antal gånger men hittade inga nya lägenheter.`,
+		title: "Contetus scraper - Inget nytt",
+	};
+}
+
+function getStartHtml() {
+	return {
+		title: "Contentus web scraper har startat upp!",
+		obj0: `Sedan kl ${new Date().toLocaleString("sv-SE")} har web scraper varit igång.`,
+	};
+}
+
 function getTomorrowStartDate() {
 	const startDate = new Date();
 	startDate.setDate(startDate.getDate() + 1); // Set to the following day
-	startDate.setHours(0, 3, 0, 0); // Set to 00:03
+	startDate.setHours(0, 2, 0, 0); // Set to 00:03
 	return startDate;
 }
 
@@ -167,13 +176,9 @@ function getRetryTime() {
 }
 
 function init() {
-	console.log("Web scraper has been initialized.");
-	const now = new Date();
-	const targetTime = new Date(
-		now.getTime() + 10 * 1000,
-	);
-	// const startDate = getTomorrowStartDate();
-
-	runCodeAtSpecificTime(targetTime);
+	const startDate = getTomorrowStartDate();
+	// const startDate = new Date(new Date().getTime() + 10000); 
+	sendEmail(getStartHtml());
+	runCodeAtSpecificTime(startDate);
 }
 init();

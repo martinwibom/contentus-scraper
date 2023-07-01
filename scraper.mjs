@@ -108,7 +108,7 @@ function runCodeAtSpecificTime(targetTime) {
 	const timeDifference = targetTime - new Date();
 	setTimeout(async () => {
 		const objects = await webScrape();
-		const stopRetrying = new Date() > new Date().setHours(21,10, 0,0);
+		const stopRetrying = new Date() > new Date().setHours(1,0, 0,0);
 		if(!objects.length && !stopRetrying) {
 			console.log("No result.. Trying again in 3 minutes!");
 			runCodeAtSpecificTime(getRetryTime());
@@ -157,8 +157,10 @@ function getNothingHtml () {
 
 function getStartHtml() {
 	return {
-		title: "Contentus web scraper har startat upp!",
-		obj0: `Sedan kl ${new Date().toLocaleString("sv-SE")} har web scraper varit igång.`,
+		title: "Contentus web scraper är igång!",
+		obj0: `<div> Sedan kl ${new Date().toLocaleString("sv-SE")} har web scraper varit igång.</div>
+		<div>Den kommer kolla efter nya lägenheter på Contentus mellan klockan 00-01 varje dag. Happy hunting! </div>
+		`,
 	};
 }
 

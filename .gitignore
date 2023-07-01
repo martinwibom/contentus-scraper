@@ -1,0 +1,28 @@
+# Directories
+node_modules/
+dist/
+build/
+vendor/
+
+# Dependency files
+package-lock.json
+yarn.lock
+.pnpm-lock.yaml
+composer.lock
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# IDE and editor files
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Compiled files
+*.log
+*.bak
+*.swp
+*.tmp

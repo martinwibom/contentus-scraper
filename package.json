@@ -1,0 +1,19 @@
+{
+  "name": "contentus-scraper",
+  "version": "1.0.0",
+  "description": "Scrapes contentus webpage for when new apartments are added",
+  "main": "scraper.js",
+  "scripts": {
+    "scrape": "node scraper.mjs"
+  },
+  "author": "me",
+  "license": "ISC",
+  "dependencies": {
+    "@emailjs/nodejs": "^2.2.0",
+    "dotenv": "^16.3.1",
+    "puppeteer": "^20.7.4"
+  },
+  "devDependencies": {
+    "eslint": "^8.43.0"
+  }
+}

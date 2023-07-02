@@ -10,7 +10,7 @@ const url = process.env.URL;
 const serviceID = process.env.SERVICE_ID;
 const publicKey = process.env.PUBLIC_KEY;
 const privateKey = process.env.PRIVATE_KEY;
-const templateID = process.env.EMAIL_TEMPALTE_ID;
+const templateID = process.env.EMAIL_TEMPLATE_ID;
 
 let attempts = 0;
 

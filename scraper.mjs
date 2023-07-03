@@ -5,6 +5,7 @@ import dotenv from "dotenv";
 
 dotenv.config();
 const THREE_MINUTES  = 3 * 60000;
+const CHROMIUM_PATH = "/usr/bin/chromium-browser";
 
 const url = process.env.URL;
 const serviceID = process.env.SERVICE_ID;
@@ -17,7 +18,7 @@ let attempts = 0;
 async function webScrape () {
 	attempts++;
 	console.log("Web scrape running...", new Date().toLocaleString("sv-SE"));
-	const browser = await puppeteer.launch({ headless: "new"});
+	const browser = await puppeteer.launch({ headless: "new", executablePath: CHROMIUM_PATH });
 	const page = await browser.newPage();
 	await page.goto(url);
     
@@ -181,6 +182,6 @@ function init() {
 	const startDate = getTomorrowStartDate();
 	// const startDate = new Date(new Date().getTime() + 10000); 
 	sendEmail(getStartHtml());
-	runCodeAtSpecificTime(startDate);
+    runCodeAtSpecificTime(startDate);
 }
 init();
